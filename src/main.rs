@@ -1,4 +1,5 @@
 use clap::{App, Arg, SubCommand};
+use std::path::PathBuf;
 
 fn main() {
     let matches = App::new("grit")
@@ -18,7 +19,7 @@ fn main() {
 
     if let Some(init) = matches.subcommand_matches("init") {
         if let Some(directory) = init.value_of("directory") {
-            init::run(directory);
+            init::run(&PathBuf::from(directory));
         }
     }
 }
@@ -26,8 +27,9 @@ fn main() {
 mod init {
     use std::fs;
     use std::path::PathBuf;
-    pub fn run(directory: &str) {
-        let mut directory = PathBuf::from(directory);
+
+    pub fn run<P: Into<PathBuf>>(directory: P) {
+        let mut directory = directory.into();
         directory.push(".git");
         fs::create_dir_all(&directory).unwrap();
         directory.push("objects");
@@ -36,14 +38,31 @@ mod init {
         directory.push("refs");
         fs::create_dir_all(&directory).unwrap();
     }
-}
 
-#[cfg(test)]
-mod dummy_tests {
+    #[cfg(test)]
+    mod test {
+        use super::*;
+        use std::{env, fs};
 
-    #[test]
-    fn passes() {
-        assert!(true);
+        #[test]
+        fn initializes_repository_in_new_directory() {
+            // ARRANGE
+            let mut directory = env::temp_dir();
+            directory.push("repo");
+            let directory = directory.as_path();
+            // ACT
+            assert_eq!(directory.is_dir(), false);
+            run(&directory);
+            // ASSERT
+            for check_directory in &[".git", ".git/refs", ".git/objects"] {
+                let mut expected_directory = PathBuf::from(directory);
+                expected_directory.push(check_directory);
+                assert!(expected_directory.is_dir());
+            }
+            // CLEANUP
+            fs::remove_dir_all(directory).unwrap();
+            assert_eq!(directory.is_dir(), false);
+        }
     }
 
 }
