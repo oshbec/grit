@@ -1,4 +1,3 @@
-
 use std::fs;
 use std::path::PathBuf;
 
@@ -26,6 +25,27 @@ mod test {
         let directory = directory.as_path();
         // ACT
         assert_eq!(directory.is_dir(), false);
+        run(&directory);
+        // ASSERT
+        for check_directory in &[".git", ".git/refs", ".git/objects"] {
+            let mut expected_directory = PathBuf::from(directory);
+            expected_directory.push(check_directory);
+            assert!(expected_directory.is_dir());
+        }
+        // CLEANUP
+        fs::remove_dir_all(directory).unwrap();
+        assert_eq!(directory.is_dir(), false);
+    }
+
+    #[test]
+    fn initializes_repository_in_an_existing_directory() {
+        // ARRANGE
+        let mut directory = env::temp_dir();
+        directory.push("some_dir");
+        let directory = directory.as_path();
+        fs::create_dir(directory).unwrap();
+        // ACT
+        assert_eq!(directory.is_dir(), true);
         run(&directory);
         // ASSERT
         for check_directory in &[".git", ".git/refs", ".git/objects"] {
