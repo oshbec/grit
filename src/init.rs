@@ -1,15 +1,13 @@
 use std::fs;
-use std::path::PathBuf;
+use std::path::Path;
 
-pub fn run<P: Into<PathBuf>>(directory: P) {
-    let mut directory = directory.into();
-    directory.push(".git");
-    fs::create_dir_all(&directory).unwrap();
-    directory.push("objects");
-    fs::create_dir_all(&directory).unwrap();
-    directory.pop();
-    directory.push("refs");
-    fs::create_dir_all(&directory).unwrap();
+pub fn run<P: AsRef<Path>>(directory: P) {
+    let directory = directory.as_ref();
+    let required_directories = &[".git", ".git/objects", ".git/refs"];
+    for required_directory in required_directories {
+        let required_directory = directory.join(required_directory);
+        fs::create_dir_all(required_directory).unwrap();
+    }
 }
 
 #[cfg(test)]
@@ -20,41 +18,35 @@ mod test {
     #[test]
     fn initializes_repository_in_new_directory() {
         // ARRANGE
-        let mut directory = env::temp_dir();
-        directory.push("repo");
-        let directory = directory.as_path();
+        let directory = env::temp_dir().join("repo");
         // ACT
         assert_eq!(directory.is_dir(), false);
         run(&directory);
         // ASSERT
         for check_directory in &[".git", ".git/refs", ".git/objects"] {
-            let mut expected_directory = PathBuf::from(directory);
-            expected_directory.push(check_directory);
+            let expected_directory = directory.join(check_directory);
             assert!(expected_directory.is_dir());
         }
         // CLEANUP
-        fs::remove_dir_all(directory).unwrap();
+        fs::remove_dir_all(&directory).unwrap();
         assert_eq!(directory.is_dir(), false);
     }
 
     #[test]
     fn initializes_repository_in_an_existing_directory() {
         // ARRANGE
-        let mut directory = env::temp_dir();
-        directory.push("some_dir");
-        let directory = directory.as_path();
-        fs::create_dir(directory).unwrap();
+        let directory = env::temp_dir().join("some_dir");
+        fs::create_dir(&directory).unwrap();
         // ACT
         assert_eq!(directory.is_dir(), true);
         run(&directory);
         // ASSERT
         for check_directory in &[".git", ".git/refs", ".git/objects"] {
-            let mut expected_directory = PathBuf::from(directory);
-            expected_directory.push(check_directory);
+            let expected_directory = directory.join(check_directory);
             assert!(expected_directory.is_dir());
         }
         // CLEANUP
-        fs::remove_dir_all(directory).unwrap();
+        fs::remove_dir_all(&directory).unwrap();
         assert_eq!(directory.is_dir(), false);
     }
 }
