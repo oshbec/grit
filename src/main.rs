@@ -1,6 +1,4 @@
 use clap::{App, Arg, SubCommand};
-use std::fs;
-use std::path::PathBuf;
 
 fn main() {
     let matches = App::new("grit")
@@ -20,15 +18,23 @@ fn main() {
 
     if let Some(init) = matches.subcommand_matches("init") {
         if let Some(directory) = init.value_of("directory") {
-            let mut directory = PathBuf::from(directory);
-            directory.push(".git");
-            fs::create_dir_all(&directory).unwrap();
-            directory.push("objects");
-            fs::create_dir_all(&directory).unwrap();
-            directory.pop();
-            directory.push("refs");
-            fs::create_dir_all(&directory).unwrap();
+            init::run(directory);
         }
+    }
+}
+
+mod init {
+    use std::fs;
+    use std::path::PathBuf;
+    pub fn run(directory: &str) {
+        let mut directory = PathBuf::from(directory);
+        directory.push(".git");
+        fs::create_dir_all(&directory).unwrap();
+        directory.push("objects");
+        fs::create_dir_all(&directory).unwrap();
+        directory.pop();
+        directory.push("refs");
+        fs::create_dir_all(&directory).unwrap();
     }
 }
 
