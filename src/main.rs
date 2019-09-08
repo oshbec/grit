@@ -10,8 +10,4 @@ mod dummy_tests {
         assert!(true);
     }
 
-    #[test]
-    fn fails() {
-        assert!(false);
-    }
 }
