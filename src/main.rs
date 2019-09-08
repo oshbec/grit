@@ -1,5 +1,4 @@
 use clap::{App, Arg, SubCommand};
-use std::path::Path;
 
 mod init;
 
@@ -21,7 +20,7 @@ fn main() {
 
     if let Some(init) = matches.subcommand_matches("init") {
         if let Some(directory) = init.value_of("directory") {
-            init::run(Path::new(directory));
+            init::run(directory);
         }
     }
 }
