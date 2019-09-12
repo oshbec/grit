@@ -1,6 +1,5 @@
+use std::fs;
 use std::path::PathBuf;
-use std::{env, fs};
-use uuid::Uuid;
 
 pub struct Repository {
     directory: PathBuf,
@@ -24,43 +23,43 @@ impl Repository {
 }
 
 #[cfg(test)]
-impl Repository {
-    pub fn t_generate_temporary() -> Repository {
-        let directory_name = format!("temporary_repo_{}", Uuid::new_v4());
-        let directory = env::temp_dir().join(directory_name);
-        assert_eq!(
-            directory.is_dir(),
-            false,
-            "Temporary repo directory already exists"
-        );
-        Repository { directory }
-    }
-
-    pub fn t_destroy(&self) {
-        fs::remove_dir_all(&self.directory).expect("Couldn't delete the repository directory");
-        assert_eq!(
-            self.directory.is_dir(),
-            false,
-            "Temporary repo directory wasn't actually deleted"
-        );
-    }
-
-    pub fn t_exists(&self) -> bool {
-        self.directory.is_dir()
-    }
-
-    pub fn t_has_expected_git_directories(&self) -> bool {
-        let expected_git_directories = vec![".git", ".git/refs", ".git/objects"];
-        expected_git_directories
-            .iter()
-            .all(|&directory| self.directory.join(directory).is_dir())
-    }
-}
-
-#[cfg(test)]
 mod tests {
     use super::Repository;
-    use std::fs;
+    use std::{env, fs};
+    use uuid::Uuid;
+
+    impl Repository {
+        pub fn t_generate_temporary() -> Repository {
+            let directory_name = format!("temporary_repo_{}", Uuid::new_v4());
+            let directory = env::temp_dir().join(directory_name);
+            assert_eq!(
+                directory.is_dir(),
+                false,
+                "Temporary repo directory already exists"
+            );
+            Repository { directory }
+        }
+
+        pub fn t_destroy(&self) {
+            fs::remove_dir_all(&self.directory).expect("Couldn't delete the repository directory");
+            assert_eq!(
+                self.directory.is_dir(),
+                false,
+                "Temporary repo directory wasn't actually deleted"
+            );
+        }
+
+        pub fn t_exists(&self) -> bool {
+            self.directory.is_dir()
+        }
+
+        pub fn t_has_expected_git_directories(&self) -> bool {
+            let expected_git_directories = vec![".git", ".git/refs", ".git/objects"];
+            expected_git_directories
+                .iter()
+                .all(|&directory| self.directory.join(directory).is_dir())
+        }
+    }
 
     #[test]
     fn initializes_repository_in_new_directory() {
