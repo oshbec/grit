@@ -42,11 +42,6 @@ mod tests {
 
         pub fn t_destroy(&self) {
             fs::remove_dir_all(&self.directory).expect("Couldn't delete the repository directory");
-            assert_eq!(
-                self.directory.is_dir(),
-                false,
-                "Temporary repo directory wasn't actually deleted"
-            );
         }
 
         pub fn t_exists(&self) -> bool {
