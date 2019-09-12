@@ -1,6 +1,8 @@
 use clap::{App, Arg, SubCommand};
 
-mod init;
+mod repository;
+
+use repository::Repository;
 
 fn main() {
     let matches = App::new("grit")
@@ -20,7 +22,7 @@ fn main() {
 
     if let Some(init) = matches.subcommand_matches("init") {
         if let Some(directory) = init.value_of("directory") {
-            init::run(directory);
+            Repository::at(directory).init();
         }
     }
 }
