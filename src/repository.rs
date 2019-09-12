@@ -6,13 +6,13 @@ pub struct Repository {
 }
 
 impl Repository {
-    pub fn init(&self) {
+    pub fn init(&self) -> Result<(), std::io::Error> {
         let required_directories = vec![".git", ".git/objects", ".git/refs"];
         for required_directory in required_directories {
             let required_directory = self.directory.join(required_directory);
-            fs::create_dir_all(required_directory)
-                .expect("Couldn't create a required repository directory")
+            fs::create_dir_all(required_directory)?;
         }
+        Ok(())
     }
 
     pub fn at<P: Into<PathBuf>>(directory: P) -> Repository {
@@ -59,7 +59,7 @@ mod tests {
     #[test]
     fn initializes_repository_in_new_directory() {
         let repository = Repository::t_generate_temporary();
-        repository.init();
+        repository.init().unwrap();
         assert!(
             repository.t_has_expected_git_directories(),
             "Newly initialized repo doesn't contain expected directories @ .git"
@@ -75,7 +75,7 @@ mod tests {
             repository.t_exists(),
             "Repo directory wasn't actually created"
         );
-        repository.init();
+        repository.init().unwrap();
         assert!(
             repository.t_has_expected_git_directories(),
             "Newly initialized repo doesn't contain expected directories @ .git"

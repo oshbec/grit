@@ -22,7 +22,10 @@ fn main() {
 
     if let Some(init) = matches.subcommand_matches("init") {
         if let Some(directory) = init.value_of("directory") {
-            Repository::at(directory).init();
+            match Repository::at(directory).init() {
+                Ok(_) => return,
+                Err(e) => println!("Failed to initialize repository: {}", e),
+            };
         }
     }
 }
