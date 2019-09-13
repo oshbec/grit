@@ -1,5 +1,5 @@
-use std::fs;
 use std::path::PathBuf;
+use std::{env, fs};
 
 pub struct Repository {
     directory: PathBuf,
@@ -15,10 +15,12 @@ impl Repository {
         Ok(())
     }
 
-    pub fn at<P: Into<PathBuf>>(directory: P) -> Repository {
-        Repository {
-            directory: directory.into(),
-        }
+    pub fn at(directory: Option<PathBuf>) -> Repository {
+        let directory = match directory {
+            Some(directory) => directory,
+            None => env::current_dir().expect("Couldn't identify current working directory"),
+        };
+        Repository { directory }
     }
 }
 
@@ -32,9 +34,8 @@ mod tests {
         pub fn t_generate_temporary() -> Repository {
             let directory_name = format!("temporary_repo_{}", Uuid::new_v4());
             let directory = env::temp_dir().join(directory_name);
-            assert_eq!(
-                directory.is_dir(),
-                false,
+            assert!(
+                !directory.is_dir(),
                 "Temporary repo directory already exists"
             );
             Repository { directory }
@@ -80,6 +81,18 @@ mod tests {
             repository.t_has_expected_git_directories(),
             "Newly initialized repo doesn't contain expected directories @ .git"
         );
+        repository.t_destroy();
+    }
+
+    #[test]
+    fn init_defaults_to_cwd_when_directory_not_specified() {
+        let temp_directory = Repository::t_generate_temporary().directory;
+        fs::create_dir_all(&temp_directory).unwrap();
+        let current_dir = env::current_dir().unwrap();
+        env::set_current_dir(temp_directory).expect("Couldn't set CWD");
+        let repository = Repository::at(None);
+        assert_eq!(repository.directory, env::current_dir().unwrap());
+        env::set_current_dir(current_dir).unwrap();
         repository.t_destroy();
     }
 }
