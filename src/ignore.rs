@@ -89,7 +89,7 @@ mod tests {
 
         let remaining_files = ignore.ignore_items(files);
 
-        assert_eq!(ignore.patterns.len(), 1);
+        assert_eq!(ignore.patterns.len(), 2);
         assert_eq!(
             remaining_files.get(0).unwrap().to_owned(),
             PathBuf::from("./haha/WAT")
