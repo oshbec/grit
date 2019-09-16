@@ -1,6 +1,7 @@
 use clap::{value_t, App, Arg, SubCommand};
-use std::path::PathBuf;
+use std::{env, path::PathBuf};
 
+mod ignore;
 mod repository;
 
 use repository::Repository;
@@ -15,6 +16,7 @@ fn main() {
                 .about("Create an empty Git repository or reinitialize an existing one")
                 .arg(Arg::with_name("directory").help("Where the repository lives")),
         )
+        .subcommand(SubCommand::with_name("commit").about("Commit some code"))
         .get_matches();
 
     if let Some(init) = matches.subcommand_matches("init") {
@@ -27,4 +29,15 @@ fn main() {
             Err(e) => println!("Failed to initialize repository: {}", e),
         };
     }
+
+    if let Some(_init) = matches.subcommand_matches("commit") {
+        commit();
+    }
+}
+
+fn commit() {
+    let current_dir = env::current_dir().unwrap();
+    let repository = Repository::at(Some(current_dir));
+    let files_to_commit = repository.list_files();
+    println!("Going to commit these files: {:?}", files_to_commit);
 }
