@@ -4,9 +4,8 @@ version = "0.1.0"
 authors = ["Josh Bechard <josh@oshbec.dev>"]
 edition = "2018"
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
-
 [dependencies]
 clap = "2.33.0"
 uuid = { version = "0.7", features = ["v4", "serde"] }
 sha1 = "0.6.0"
+libflate = "0.1"

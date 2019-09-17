@@ -3,6 +3,10 @@ use std::{env, fs, io, path::PathBuf};
 
 use uuid::Uuid;
 
+use std::io::Write;
+
+use libflate;
+
 pub struct Object {
     id: String,
     contents: String,
@@ -48,13 +52,20 @@ impl Object {
     }
 
     pub fn write(&self) -> Result<(), io::Error> {
-        let path_to_entry = &self.path();
+        let path_to_entry = self.path();
         let directory = path_to_entry
             .parent()
             .expect("Couldn't get parent directory for db object");
         let tmp_object_path = directory.join(format!("tmp_object_{}", Uuid::new_v4()));
         fs::create_dir_all(directory)?;
-        fs::write(&tmp_object_path, &self.entry)?;
+        let mut tmp_object_file = fs::File::create(&tmp_object_path)?;
+        let mut encoder = libflate::zlib::Encoder::new(Vec::new()).unwrap();
+        io::copy(&mut self.entry.to_owned().as_bytes(), &mut encoder).unwrap();
+        let encoded_data = encoder
+            .finish()
+            .into_result()
+            .expect("Couldn't get encoding result");
+        tmp_object_file.write_all(&encoded_data)?;
         fs::rename(tmp_object_path, path_to_entry)?;
         Ok(())
     }
