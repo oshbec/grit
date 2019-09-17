@@ -9,3 +9,4 @@ edition = "2018"
 [dependencies]
 clap = "2.33.0"
 uuid = { version = "0.7", features = ["v4", "serde"] }
+sha1 = "0.6.0"

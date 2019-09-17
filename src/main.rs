@@ -2,8 +2,10 @@ use clap::{value_t, App, Arg, SubCommand};
 use std::{env, path::PathBuf};
 
 mod ignore;
+mod objects;
 mod repository;
 
+use objects::Object;
 use repository::Repository;
 
 fn main() {
@@ -39,5 +41,11 @@ fn commit() {
     let current_dir = env::current_dir().unwrap();
     let repository = Repository::at(Some(current_dir));
     let files_to_commit = repository.list_files();
+    for file in &files_to_commit {
+        let object = Object::from_file(file);
+        object
+            .write()
+            .expect("Couldn't write entry to git database");
+    }
     println!("Going to commit these files: {:?}", files_to_commit);
 }
