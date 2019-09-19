@@ -43,7 +43,7 @@ fn commit() {
     let repository = Repository::at(Some(current_dir));
     let files_to_commit = repository.list_files();
     for file in &files_to_commit {
-        let object = Object::from_file(file);
+        let object = Object::blob_from_file(file);
         object
             .write()
             .expect("Couldn't write entry to git database");
