@@ -28,12 +28,7 @@ impl Ignore {
     pub fn ignore_items(&self, paths: Vec<PathBuf>) -> Vec<PathBuf> {
         paths
             .into_iter()
-            .filter_map(|p| {
-                if self.ignore_item(&p) {
-                    return None;
-                }
-                Some(p)
-            })
+            .filter(|p| !self.ignore_item(&p))
             .collect()
     }
 }
