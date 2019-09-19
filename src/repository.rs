@@ -18,7 +18,6 @@ impl Repository {
             ignore: Ignore::new(),
         };
         repo.ignore.add_pattern(String::from(".git"));
-        let repo = repo;
         repo
     }
 

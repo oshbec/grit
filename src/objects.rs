@@ -15,13 +15,13 @@ pub struct Object {
     entry: String,
 }
 
-fn entry_from_contents(contents: &String) -> String {
+fn entry_from_contents(contents: &str) -> String {
     let object_type = String::from("blob");
     let byte_length = contents.to_owned().into_bytes().len().to_string();
     format!("{} {}\0{}", object_type, byte_length, contents)
 }
 
-pub fn id_from_entry(entry: &String) -> String {
+pub fn id_from_entry(entry: &str) -> String {
     let mut m = sha1::Sha1::new();
     m.update(&entry.to_owned().into_bytes());
     m.digest().to_string()
@@ -49,8 +49,7 @@ impl Object {
             .join(".git")
             .join("objects")
             .join(&self.id[0..2]);
-        let path_to_file = directory.join(&self.id[2..]);
-        path_to_file
+        directory.join(&self.id[2..])
     }
 
     pub fn write(&self) -> Result<(), io::Error> {

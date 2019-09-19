@@ -1,8 +1,8 @@
 use libflate::zlib::{Decoder, Encoder};
 use std::io::{self, Read};
 
-pub fn compress(bytes: &Vec<u8>) -> Vec<u8> {
-    let mut bytes: &[u8] = bytes.as_ref();
+pub fn compress(bytes: &[u8]) -> Vec<u8> {
+    let mut bytes: &[u8] = bytes;
     let mut encoder = Encoder::new(Vec::new()).unwrap();
     io::copy(&mut bytes, &mut encoder).unwrap();
     encoder
@@ -11,8 +11,8 @@ pub fn compress(bytes: &Vec<u8>) -> Vec<u8> {
         .expect("Couldn't compress the data")
 }
 
-fn _decompress(compressed_bytes: &Vec<u8>) -> Vec<u8> {
-    let compressed_bytes: &[u8] = compressed_bytes;
+fn _decompress(compressed_bytes: &[u8]) -> Vec<u8> {
+    // let compressed_bytes: &[u8] = compressed_bytes;
     let mut decoder = Decoder::new(compressed_bytes).unwrap();
     let mut bytes = Vec::new();
     decoder.read_to_end(&mut bytes).unwrap();
