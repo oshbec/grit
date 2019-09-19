@@ -1,6 +1,7 @@
 use clap::{value_t, App, Arg, SubCommand};
 use std::{env, path::PathBuf};
 
+mod compression;
 mod ignore;
 mod objects;
 mod repository;

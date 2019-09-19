@@ -1,11 +1,13 @@
-use sha1;
-use std::{env, fs, io, path::PathBuf};
+use std::{
+    env, fs,
+    io::{self, Write},
+    path::PathBuf,
+};
 
+use sha1;
 use uuid::Uuid;
 
-use std::io::Write;
-
-use libflate;
+use crate::compression;
 
 pub struct Object {
     id: String,
@@ -51,15 +53,6 @@ impl Object {
         path_to_file
     }
 
-    pub fn compress(&self) -> Vec<u8> {
-        let mut encoder = libflate::zlib::Encoder::new(Vec::new()).unwrap();
-        io::copy(&mut self.entry.to_owned().as_bytes(), &mut encoder).unwrap();
-        encoder
-            .finish()
-            .into_result()
-            .expect("Couldn't get encoding result")
-    }
-
     pub fn write(&self) -> Result<(), io::Error> {
         let path_to_entry = self.path();
         let directory = path_to_entry
@@ -67,7 +60,7 @@ impl Object {
             .expect("Couldn't get parent directory for db object");
         let tmp_object_path = directory.join(format!("tmp_object_{}", Uuid::new_v4()));
         fs::create_dir_all(directory)?;
-        let encoded_data = self.compress();
+        let encoded_data = compression::compress(&self.entry.to_owned().as_bytes().to_vec());
         fs::File::create(&tmp_object_path)?.write_all(&encoded_data)?;
         fs::rename(tmp_object_path, path_to_entry)?;
         Ok(())
@@ -95,21 +88,6 @@ mod tests {
         assert_eq!(
             object.id,
             "a8be488abce200ee4f988c2a63ed5a61f8362521".to_string()
-        );
-    }
-
-    #[test]
-    fn compresses_the_entry() {
-        // This is sort of a snapshot-style test
-        let contents = "This is some great content".to_string();
-        let object = Object::from_contents(contents);
-        assert_eq!(
-            object.compress(),
-            vec![
-                120, 156, 13, 194, 81, 9, 0, 32, 12, 4, 80, 163, 92, 6, 63, 76, 98, 1, 39, 67, 5,
-                221, 192, 93, 127, 20, 158, 108, 23, 228, 146, 234, 92, 129, 47, 252, 40, 198, 213,
-                70, 116, 55, 170, 241, 1, 195, 52, 11, 222,
-            ]
         );
     }
 
