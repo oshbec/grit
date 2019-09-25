@@ -5,12 +5,14 @@ pub struct Ignore {
 }
 
 impl Ignore {
+    #[cfg(test)]
     pub fn new() -> Ignore {
         Ignore {
             patterns: Vec::new(),
         }
     }
 
+    #[cfg(test)]
     pub fn add_pattern(&mut self, pattern: String) {
         self.patterns.push(pattern);
     }
@@ -30,6 +32,14 @@ impl Ignore {
             .into_iter()
             .filter(|p| !self.ignore_item(&p))
             .collect()
+    }
+}
+
+impl Default for Ignore {
+    fn default() -> Ignore {
+        Ignore {
+            patterns: vec![String::from(".git")],
+        }
     }
 }
 
