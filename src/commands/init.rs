@@ -14,11 +14,11 @@ pub fn run(directory: Option<&PathBuf>) {
 mod tests {
 
     use super::*;
-    use crate::test_utilities::TempWorkspace;
+    use crate::test_utilities::TestWorkspace;
 
     #[test]
     fn initializes_repository_in_existing_directory() {
-        let workspace = TempWorkspace::setup();
+        let workspace = TestWorkspace::setup();
         assert_eq!(
             workspace.directory.is_dir(),
             true,
@@ -37,7 +37,7 @@ mod tests {
 
     #[test]
     fn init_defaults_to_cwd_when_directory_not_specified() {
-        let workspace = TempWorkspace::setup();
+        let workspace = TestWorkspace::setup();
         run(None);
         let expected_git_directories = vec![".git", ".git/refs", ".git/objects"];
         assert!(

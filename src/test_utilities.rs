@@ -3,18 +3,18 @@
 use std::{env, fs, path::PathBuf};
 use uuid::Uuid;
 
-pub struct TempWorkspace {
+pub struct TestWorkspace {
     pub directory: PathBuf,
     original_working_directory: PathBuf,
 }
 
-impl TempWorkspace {
-    pub fn setup() -> TempWorkspace {
+impl TestWorkspace {
+    pub fn setup() -> TestWorkspace {
         let workspace_path = path_to_temporary_workspace();
         fs::create_dir_all(&workspace_path).expect("Couldn't create temporary workspace directory");
         let original_working_directory = env::current_dir().unwrap();
         env::set_current_dir(&workspace_path).expect("Couldn't set CWD to temp workspace");
-        TempWorkspace {
+        TestWorkspace {
             directory: workspace_path,
             original_working_directory,
         }

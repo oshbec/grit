@@ -33,11 +33,11 @@ fn list_files(workspace: &PathBuf, ignore: &Ignore) -> Vec<PathBuf> {
 mod tests {
 
     use super::*;
-    use crate::test_utilities::TempWorkspace;
+    use crate::test_utilities::TestWorkspace;
 
     #[test]
     fn list_files_that_are_not_ignored() {
-        let workspace = TempWorkspace::setup();
+        let workspace = TestWorkspace::setup();
 
         let mut ignore = Ignore::new();
         ignore.add_pattern(String::from("LICENSE"));
