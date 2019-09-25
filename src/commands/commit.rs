@@ -44,10 +44,12 @@ mod tests {
 
         let readme_file = workspace.directory.join("README");
         fs::write(&readme_file, "This is the README").unwrap();
+
         let license_file = workspace.directory.join("LICENSE");
         fs::write(&license_file, "This is the license").unwrap();
 
         let commitable_files = super::list_files(&workspace.directory, &ignore);
+
         assert_eq!(commitable_files.len(), 1);
         assert_eq!(commitable_files.get(0).unwrap().to_owned(), readme_file);
 
