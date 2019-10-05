@@ -63,8 +63,9 @@ pub trait Object {
     }
 }
 
+/// Write an object to the Git database
 pub fn write(object: &impl Object) -> Result<(), io::Error> {
-    let compressed_data = compression::compress(&object.build_file());
+    let compressed_data = compression::compress(&object.build_file())?;
     let path_to_object = object.path();
 
     let directory = path_to_object
@@ -140,5 +141,4 @@ mod tests {
 
         assert_eq!(object.path(), expected_path);
     }
-
 }
