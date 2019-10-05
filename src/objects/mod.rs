@@ -112,7 +112,7 @@ mod tests {
         let object = SomeObject::new();
         assert_eq!(
             object.id(),
-            "cc9d52752996f06ac0f1479f56f33440a6c6f2f8".to_string()
+            "a8be488abce200ee4f988c2a63ed5a61f8362521".to_string()
         );
     }
 
@@ -123,13 +123,13 @@ mod tests {
         // Just showing that we know the full SHA1 hash to base expected path from
         assert_eq!(
             object.id(),
-            "cc9d52752996f06ac0f1479f56f33440a6c6f2f8".to_string()
+            "a8be488abce200ee4f988c2a63ed5a61f8362521".to_string()
         );
 
         // first two characters of sha1
-        let directory = "cc".to_string();
+        let directory = "a8".to_string();
         // remaining characters of sha1
-        let file = "9d52752996f06ac0f1479f56f33440a6c6f2f8".to_string();
+        let file = "be488abce200ee4f988c2a63ed5a61f8362521".to_string();
 
         let expected_path = env::current_dir()
             .unwrap()
