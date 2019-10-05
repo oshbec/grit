@@ -7,7 +7,9 @@ pub struct Tree {
     content: Vec<u8>,
 }
 
+#[allow(dead_code)]
 impl Tree {
+    /// Build a new tree from a collection of Blobs
     pub fn from_blobs(blobs: Vec<Blob>) -> Tree {
         let mut blobs = blobs;
 

@@ -8,6 +8,7 @@ pub struct Blob {
 }
 
 impl Blob {
+    /// Build a Blob from a file
     pub fn from_file<P: Into<PathBuf>>(source: P) -> Blob {
         let source = source.into();
         let content = fs::read_to_string(&source)

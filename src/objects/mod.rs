@@ -15,16 +15,23 @@ pub use tree::Tree;
 
 use crate::compression;
 
+/// The kind of object we're dealing with
 pub enum Kind {
+    /// Represents a file
     Blob,
+    /// Represents a collection of blobs
     Tree,
     // Commit,
 }
 
 use Kind::*;
 
+/// Something that can be saved to Git's database in `objects/`
 pub trait Object {
+    /// Get the content of the object, in bytes
     fn content(&self) -> &Vec<u8>;
+
+    /// Get the kind of object we're working with
     fn kind(&self) -> &Kind;
 
     /// Calculate the ID of the object, given a hash of its file
@@ -35,6 +42,7 @@ pub trait Object {
         hash.digest().to_string()
     }
 
+    /// Show the path to where the object might be saved in the database
     fn path(&self) -> PathBuf {
         let current_dir = env::current_dir().expect("Couldn't get current working directory");
         let id = self.id();
@@ -45,6 +53,7 @@ pub trait Object {
             .join(&id[2..])
     }
 
+    /// Format the object for file persistence
     fn build_file(&self) -> Vec<u8> {
         let kind = match self.kind() {
             Blob => "blob",
@@ -58,6 +67,7 @@ pub trait Object {
         file
     }
 
+    /// Show the formatted object file in a readable, but lossy way
     fn show_file(&self) -> String {
         String::from_utf8_lossy(&self.build_file()).into_owned()
     }

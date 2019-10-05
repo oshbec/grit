@@ -1,5 +1,6 @@
 use std::path::PathBuf;
 
+/// Holds ignore patterns and answers questions about whether stuff should be ignored
 pub struct Ignore {
     patterns: Vec<String>,
 }
@@ -17,6 +18,7 @@ impl Ignore {
         self.patterns.push(pattern);
     }
 
+    /// Check to see if a given path should be ignored
     pub fn ignore_item(&self, path: &PathBuf) -> bool {
         let file_name: String = path
             .file_name()
@@ -27,6 +29,7 @@ impl Ignore {
         self.patterns.contains(&file_name)
     }
 
+    /// Filter a list of paths to those that shouldn't be ignored
     pub fn ignore_items(&self, paths: Vec<PathBuf>) -> Vec<PathBuf> {
         paths
             .into_iter()
