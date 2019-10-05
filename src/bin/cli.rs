@@ -1,11 +1,9 @@
 use clap::{value_t, App, Arg, SubCommand};
 use std::path::PathBuf;
 
-mod commands;
-mod compression;
-mod ignore;
-mod objects;
-mod test_utilities;
+extern crate grit;
+
+use grit::commands;
 
 fn main() {
     let matches = App::new("grit")
