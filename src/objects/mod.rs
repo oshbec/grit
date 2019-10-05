@@ -27,10 +27,11 @@ pub trait Object {
     fn content(&self) -> &Vec<u8>;
     fn kind(&self) -> &Kind;
 
+    /// Calculate the ID of the object, given a hash of its file
     fn id(&self) -> String {
         let mut hash = sha1::Sha1::new();
-        let content = self.content().as_slice();
-        hash.update(content);
+        let content = self.build_file();
+        hash.update(content.as_slice());
         hash.digest().to_string()
     }
 
