@@ -1,6 +1,8 @@
 use crate::objects::{blob::Blob, Kind, Object};
 use hex;
 
+use std::{env, path::PathBuf};
+
 #[derive(Debug)]
 pub struct Tree {
     blobs: Vec<Blob>,
@@ -29,12 +31,7 @@ impl Tree {
 
                 let mut mode: Vec<u8> = String::from("100644").as_bytes().to_owned();
                 let mut empty_string = String::from(" ").as_bytes().to_owned();
-                let mut source = blob
-                    .source()
-                    .to_str()
-                    .expect("Couldn't convert blob source to string")
-                    .as_bytes()
-                    .to_owned();
+                let mut source = path_relative_to_cwd(blob.source()).as_bytes().to_owned();
                 let mut null_byte: Vec<u8> = vec![0];
                 let mut hex_id = hex::decode(blob.id()).expect("Invalid hex ID");
 
@@ -50,6 +47,21 @@ impl Tree {
             .collect();
         Tree { content, blobs }
     }
+}
+
+fn path_relative_to_cwd(path: &PathBuf) -> String {
+    let current_dir = env::current_dir()
+        .expect("Couldn't determine current directory")
+        .to_str()
+        .unwrap()
+        .to_owned();
+
+    path.to_str()
+        .unwrap()
+        .to_owned()
+        .replace(&current_dir, "")
+        .trim_start_matches('/')
+        .to_string()
 }
 
 impl Object for Tree {
