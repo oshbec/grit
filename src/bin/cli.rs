@@ -15,7 +15,15 @@ fn main() {
                 .about("Create an empty Git repository or reinitialize an existing one")
                 .arg(Arg::with_name("directory").help("Where the repository lives")),
         )
-        .subcommand(SubCommand::with_name("commit").about("Commit some code"))
+        .subcommand(
+            SubCommand::with_name("commit")
+                .about("Commit some code")
+                .arg(
+                    Arg::with_name("message")
+                        .short("m")
+                        .help("A helpful message to accompany the commit"),
+                ),
+        )
         .get_matches();
 
     if let Some(init) = matches.subcommand_matches("init") {
@@ -25,7 +33,11 @@ fn main() {
         };
     }
 
-    if let Some(_init) = matches.subcommand_matches("commit") {
-        commands::commit();
+    if let Some(commit) = matches.subcommand_matches("commit") {
+        let message = match value_t!(commit, "message", String) {
+            Ok(message) => message,
+            Err(_) => "".to_string(),
+        };
+        commands::commit(&message, None);
     }
 }

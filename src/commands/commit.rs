@@ -2,11 +2,11 @@ use std::{env, fs, path::PathBuf};
 
 use crate::{
     ignore::Ignore,
-    objects::{self, Blob, Commit, Tree},
+    objects::{self, Blob, Commit, Object, Tree},
 };
 
 /// Record changes to the repository
-pub fn run() {
+pub fn run(message: &str, date: Option<time::Tm>) {
     let current_dir = env::current_dir().expect("Couldn't determine current directory");
     let ignore: Ignore = Default::default();
     let files_to_commit = list_files(&current_dir, &ignore);
@@ -20,7 +20,7 @@ pub fn run() {
         .collect();
     let tree = Tree::from_blobs(blobs);
     objects::write(&tree).expect("Couldn't write tree to git database");
-    let commit = Commit::new(tree, Some("It is a commit!".to_string()));
+    let commit = Commit::new(tree.id(), message, date);
     objects::write(&commit).expect("Couldn't write the commit to git database")
 }
 
