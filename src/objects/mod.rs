@@ -8,9 +8,11 @@ use sha1;
 use uuid::Uuid;
 
 mod blob;
+mod commit;
 mod tree;
 
 pub use blob::Blob;
+pub use commit::Commit;
 pub use tree::Tree;
 
 use crate::compression;
@@ -21,7 +23,7 @@ pub enum Kind {
     Blob,
     /// Represents a collection of blobs
     Tree,
-    // Commit,
+    Commit,
 }
 
 use Kind::*;
@@ -58,7 +60,7 @@ pub trait Object {
         let kind = match self.kind() {
             Blob => "blob",
             Tree => "tree",
-            // Commit => "commit",
+            Commit => "commit",
         };
         let byte_length = self.content().len();
 

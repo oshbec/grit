@@ -16,7 +16,7 @@ fn creates_objects_found_in_real_git_commit() {
 
     test_bed.git_command(vec!["init"]);
     test_bed.git_command(vec!["add", "."]);
-    test_bed.git_command(vec!["commit", "-m \"First commit\""]);
+    test_bed.git_command(vec!["commit", "-m", "It is a commit!"]);
 
     assert!(
         test_bed.contained_by_twin(".git/objects"),

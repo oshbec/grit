@@ -2,7 +2,7 @@ use std::{env, fs, path::PathBuf};
 
 use crate::{
     ignore::Ignore,
-    objects::{self, Blob, Tree},
+    objects::{self, Blob, Commit, Tree},
 };
 
 /// Record changes to the repository
@@ -20,12 +20,14 @@ pub fn run() {
         .collect();
     let tree = Tree::from_blobs(blobs);
     objects::write(&tree).expect("Couldn't write tree to git database");
+    let commit = Commit::new(tree, Some("It is a commit!".to_string()));
+    objects::write(&commit).expect("Couldn't write the commit to git database")
 }
 
 fn list_files(workspace: &PathBuf, ignore: &Ignore) -> Vec<PathBuf> {
     let workspace_files = fs::read_dir(workspace)
         .expect("Could not read files in the workspace")
-        .map(|dir_entry| dir_entry.unwrap().path())
+        .map(|dir_entry| dir_entry.expect("Can't get dir_entry").path())
         .collect();
     ignore.ignore_items(workspace_files)
 }

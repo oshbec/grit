@@ -16,6 +16,10 @@ impl TestBed {
         fs::create_dir_all(test_bed.workspace()).expect("Couldn't create workspace directory");
         fs::create_dir_all(test_bed.twin()).expect("Couldn't create twin directory");
         env::set_current_dir(test_bed.workspace()).expect("Couldn't set workspace to CWD");
+        env::set_var("GIT_AUTHOR_NAME", "Count Dracula");
+        env::set_var("GIT_AUTHOR_EMAIL", "count@dracula");
+        env::set_var("GIT_COMMITTER_NAME", "Count Dracula");
+        env::set_var("GIT_COMMITTER_EMAIL", "count@dracula");
         test_bed
     }
 
@@ -48,7 +52,7 @@ impl TestBed {
     }
 
     // Create a directory in both `workspace` and `twin`
-    fn create_directory(&self, relative_path: &str) {
+    pub fn create_directory(&self, relative_path: &str) {
         for test_parallel in self.test_parallels() {
             let path = test_parallel.join(relative_path);
             fs::create_dir_all(&path).expect("Couldn't create duplicate directory");
@@ -160,6 +164,11 @@ fn simple_write_file(path: &PathBuf, contents: &str) {
     fs::write(path, &contents).expect("Couldn't write file");
 }
 
+// Tests the TestBed helper
+// These get really noisy since every test file is considered its own
+// crate, and they are re-run for each.
+// We can un-ignore this with `cargo test -- --ignored`
+#[cfg(feature = "helper_tests")]
 mod tests {
     use super::*;
 

@@ -22,7 +22,7 @@ impl Ignore {
     pub fn ignore_item(&self, path: &PathBuf) -> bool {
         let file_name: String = path
             .file_name()
-            .unwrap()
+            .expect("Couldn't get file name from path")
             .to_string_lossy()
             .to_owned()
             .to_string();

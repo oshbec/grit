@@ -10,7 +10,11 @@ uuid = { version = "0.7", features = ["v4", "serde"] }
 sha1 = "0.6.0"
 libflate = "0.1"
 hex = "0.4.0"
+time = "0.1.42"
 
 [[bin]]
 name = "grit-cli"
 path = "src/bin/cli.rs"
+
+[features]
+helper_tests = []
