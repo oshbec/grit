@@ -164,10 +164,6 @@ fn simple_write_file(path: &PathBuf, contents: &str) {
     fs::write(path, &contents).expect("Couldn't write file");
 }
 
-// Tests the TestBed helper
-// These get really noisy since every test file is considered its own
-// crate, and they are re-run for each.
-// We can un-ignore this with `cargo test -- --ignored`
 #[cfg(feature = "helper_tests")]
 mod tests {
     use super::*;
