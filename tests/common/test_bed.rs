@@ -87,7 +87,11 @@ impl TestBed {
             let workspace_files = descendent_files(&path_in_workspace);
             return workspace_files.iter().all(|file| {
                 let twin = self.find_twin(file);
-                files_are_identical(file, &twin)
+                let identical = files_are_identical(file, &twin);
+                if !identical {
+                    inspect_parallels(&path_in_workspace, &path_in_twin);
+                }
+                identical
             });
         }
 
@@ -132,11 +136,6 @@ pub fn files_are_identical(first: &PathBuf, second: &PathBuf) -> bool {
             return false;
         }
     };
-    println!(
-        "Just read file: {:?}\n\n{:?}\n",
-        first,
-        String::from_utf8_lossy(&first_file)
-    );
     let second_file = match simple_read_file(second) {
         Ok(file) => file,
         Err(_) => {
@@ -144,11 +143,6 @@ pub fn files_are_identical(first: &PathBuf, second: &PathBuf) -> bool {
             return false;
         }
     };
-    println!(
-        "Just read file: {:?}\n\n{:?}\n",
-        second,
-        String::from_utf8_lossy(&second_file)
-    );
 
     let they_match = first_file == second_file;
     if !they_match {
@@ -156,8 +150,43 @@ pub fn files_are_identical(first: &PathBuf, second: &PathBuf) -> bool {
             "Files did not match :-(\n\n{:?}\n\n{:?}\n\n{:?}\n\n{:?}",
             first, first_file, second, second_file
         );
+        inspect_parallels(first, second);
     }
     they_match
+}
+
+pub fn inspect_parallels(first: &PathBuf, second: &PathBuf) {
+    if first.is_file() && second.is_file() {
+        println!("=== COMPARING FILES ===");
+        simple_print_file(first);
+        println!("===       VS.       ===");
+        simple_print_file(second);
+        println!("===       END       ===");
+    }
+    if first.is_dir() && second.is_dir() {
+        let first_files = descendent_files(first);
+        let second_files = descendent_files(second);
+        println!("=== FILES IN FIRST DIRECTORY ===");
+        for file in first_files {
+            simple_print_file(&file);
+        }
+        println!("=== FILES IN SECOND DIRECTORY ===");
+        for file in second_files {
+            simple_print_file(&file);
+        }
+    }
+}
+
+fn simple_print_file(path: &PathBuf) {
+    let contents = match simple_read_file(path) {
+        Ok(contents) => contents,
+        _ => panic!("Couldnt read file {:?}", path),
+    };
+    println!(
+        "File at `{:?}` contains:\n{}",
+        path,
+        String::from_utf8_lossy(&contents)
+    );
 }
 
 // Reads a file, and returns a decrompressed version if that operation is successful
