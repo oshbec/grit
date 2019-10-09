@@ -6,7 +6,7 @@ use crate::{
 };
 
 /// Record changes to the repository
-pub fn run(message: &str) {
+pub fn run(message: &str) -> Result<String, String> {
     let current_dir = env::current_dir().expect("Couldn't determine current directory");
     let ignore: Ignore = Default::default();
     let files_to_commit = list_files(&current_dir, &ignore);
@@ -21,7 +21,9 @@ pub fn run(message: &str) {
     let tree = Tree::from_blobs(blobs);
     objects::write(&tree).expect("Couldn't write tree to git database");
     let commit = Commit::new(tree.id(), message);
-    objects::write(&commit).expect("Couldn't write the commit to git database")
+    objects::write(&commit).expect("Couldn't write the commit to git database");
+    fs::write(".git/HEAD", commit.id()).expect("Couldn't write commit ID to HEAD");
+    Ok(commit.id())
 }
 
 fn list_files(workspace: &PathBuf, ignore: &Ignore) -> Vec<PathBuf> {

@@ -3,7 +3,7 @@ use grit::commands::{commit, init};
 
 use common::TestBed;
 
-use std::env;
+use std::{env, fs};
 
 use chrono::Local;
 
@@ -22,7 +22,7 @@ fn creates_objects_found_in_real_git_commit() {
     env::set_var("GIT_AUTHOR_DATE", &right_now);
     env::set_var("GIT_COMMITTER_DATE", &right_now);
 
-    commit(message);
+    let commit_id = commit(message).unwrap();
 
     test_bed.git_command(vec!["init"]);
     test_bed.git_command(vec!["add", "."]);
@@ -33,6 +33,10 @@ fn creates_objects_found_in_real_git_commit() {
         "Files in workspace not contained by twin, take a look:\n{:?}",
         test_bed.root
     );
+
+    let found_commit_id = fs::read_to_string(".git/HEAD").unwrap();
+
+    assert_eq!(commit_id, found_commit_id);
 
     test_bed.teardown();
 }
