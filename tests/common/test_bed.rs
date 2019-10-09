@@ -132,6 +132,11 @@ pub fn files_are_identical(first: &PathBuf, second: &PathBuf) -> bool {
             return false;
         }
     };
+    println!(
+        "Just read file: {:?}\n\n{:?}\n",
+        first,
+        String::from_utf8_lossy(&first_file)
+    );
     let second_file = match simple_read_file(second) {
         Ok(file) => file,
         Err(_) => {
@@ -139,6 +144,11 @@ pub fn files_are_identical(first: &PathBuf, second: &PathBuf) -> bool {
             return false;
         }
     };
+    println!(
+        "Just read file: {:?}\n\n{:?}\n",
+        second,
+        String::from_utf8_lossy(&second_file)
+    );
 
     let they_match = first_file == second_file;
     if !they_match {
