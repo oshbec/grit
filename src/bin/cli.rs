@@ -38,6 +38,6 @@ fn main() {
             Ok(message) => message,
             Err(_) => "".to_string(),
         };
-        commands::commit(&message, None);
+        commands::commit(&message);
     }
 }

@@ -3,7 +3,7 @@ use grit::commands::{commit, init};
 
 use common::TestBed;
 
-use time;
+use std::env;
 
 #[test]
 fn creates_objects_found_in_real_git_commit() {
@@ -14,28 +14,22 @@ fn creates_objects_found_in_real_git_commit() {
     test_bed.create_file("README", "This is the README");
     // test_bed.create_file("LICENSE", "This is the license");
 
-    let right_now = time::now();
-
     let message = "It is a commit!";
-
-    commit(message, Some(right_now));
-
     let right_now = format!(
         "{}",
-        right_now
-            .strftime("%Y-%m-%d")
-            .expect("Could not format date")
+        time::now()
+            .strftime("%s %z")
+            .expect("Couldn't format current time")
     );
+
+    env::set_var("GIT_AUTHOR_DATE", &right_now);
+    env::set_var("GIT_COMMITTER_DATE", &right_now);
+
+    commit(message);
 
     test_bed.git_command(vec!["init"]);
     test_bed.git_command(vec!["add", "."]);
-    test_bed.git_command(vec![
-        "commit",
-        "-m",
-        "It is a commit!",
-        "--date",
-        &right_now,
-    ]);
+    test_bed.git_command(vec!["commit", "-m", "It is a commit!"]);
 
     assert!(
         test_bed.contained_by_twin(".git/objects"),

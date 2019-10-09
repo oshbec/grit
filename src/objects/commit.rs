@@ -1,6 +1,5 @@
 use crate::objects::{Kind, Object};
 use std::env;
-use time;
 
 #[derive(Debug)]
 pub struct Commit {
@@ -8,13 +7,11 @@ pub struct Commit {
 }
 
 impl Commit {
-    pub fn new(tree_id: String, message: &str, date: Option<time::Tm>) -> Commit {
-        let right_now = time::now();
-        let date = date.unwrap_or(right_now);
+    pub fn new(tree_id: String, message: &str) -> Commit {
         let author_name = env::var("GIT_AUTHOR_NAME").unwrap();
         let author_email = env::var("GIT_AUTHOR_EMAIL").unwrap();
-        let timestamp = format!("{}", date.strftime("%s %z").expect("Could not format date"));
-        let author = format!("{} <{}> {}", author_name, author_email, timestamp);
+        let author_date = env::var("GIT_AUTHOR_DATE").unwrap();
+        let author = format!("{} <{}> {}", author_name, author_email, author_date);
         let content = format!(
             "tree {}\nauthor {}\ncommitter {}\n\n{}\n",
             tree_id, author, author, message
