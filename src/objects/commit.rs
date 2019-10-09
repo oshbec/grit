@@ -1,4 +1,5 @@
 use crate::objects::{Kind, Object};
+use chrono::Local;
 use std::env;
 
 #[derive(Debug)]
@@ -8,9 +9,12 @@ pub struct Commit {
 
 impl Commit {
     pub fn new(tree_id: String, message: &str) -> Commit {
-        let author_name = env::var("GIT_AUTHOR_NAME").unwrap();
-        let author_email = env::var("GIT_AUTHOR_EMAIL").unwrap();
-        let author_date = env::var("GIT_AUTHOR_DATE").unwrap();
+        let author_name = env::var("GIT_AUTHOR_NAME").expect("Couldn't determine author name");
+        let author_email = env::var("GIT_AUTHOR_EMAIL").expect("Couldn't determine author email");
+        let author_date = match env::var("GIT_AUTHOR_DATE") {
+            Ok(date) => date,
+            Err(_) => Local::now().format("%s %z").to_string(),
+        };
         let author = format!("{} <{}> {}", author_name, author_email, author_date);
         let content = format!(
             "tree {}\nauthor {}\ncommitter {}\n\n{}\n",
