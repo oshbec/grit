@@ -14,7 +14,7 @@ fn creates_objects_found_in_real_git_commit() {
     init(Some(&test_bed.workspace()));
 
     test_bed.create_file("README", "This is the README");
-    // test_bed.create_file("LICENSE", "This is the license");
+    test_bed.create_file("LICENSE", "This is the license");
 
     let message = "It is a commit!";
     let right_now = Local::now().format("%s %z").to_string();
