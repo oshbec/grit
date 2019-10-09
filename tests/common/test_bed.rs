@@ -127,11 +127,17 @@ fn descendent_files(directory: &PathBuf) -> Vec<PathBuf> {
 pub fn files_are_identical(first: &PathBuf, second: &PathBuf) -> bool {
     let first_file = match simple_read_file(first) {
         Ok(file) => file,
-        Err(_) => return false,
+        Err(_) => {
+            println!("Couldn't read file: {:?}", first);
+            return false;
+        }
     };
     let second_file = match simple_read_file(second) {
         Ok(file) => file,
-        Err(_) => return false,
+        Err(_) => {
+            println!("Couldn't read file: {:?}", second);
+            return false;
+        }
     };
 
     let they_match = first_file == second_file;
