@@ -5,6 +5,8 @@ use common::TestBed;
 
 use std::env;
 
+use chrono::Local;
+
 #[test]
 fn creates_objects_found_in_real_git_commit() {
     let test_bed = TestBed::setup();
@@ -15,12 +17,7 @@ fn creates_objects_found_in_real_git_commit() {
     // test_bed.create_file("LICENSE", "This is the license");
 
     let message = "It is a commit!";
-    let right_now = format!(
-        "{}",
-        time::now()
-            .strftime("%s %z")
-            .expect("Couldn't format current time")
-    );
+    let right_now = Local::now().format("%s %z").to_string();
 
     env::set_var("GIT_AUTHOR_DATE", &right_now);
     env::set_var("GIT_COMMITTER_DATE", &right_now);
