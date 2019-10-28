@@ -1,6 +1,7 @@
 use crate::objects::{Kind, Object};
 use chrono::Local;
-use std::env;
+
+use crate::config::Config;
 
 #[derive(Debug)]
 pub struct Commit {
@@ -9,11 +10,12 @@ pub struct Commit {
 
 impl Commit {
     pub fn new(tree_id: String, message: &str) -> Commit {
-        let author_name = env::var("GIT_AUTHOR_NAME").expect("Couldn't determine author name");
-        let author_email = env::var("GIT_AUTHOR_EMAIL").expect("Couldn't determine author email");
-        let author_date = match env::var("GIT_AUTHOR_DATE") {
-            Ok(date) => date,
-            Err(_) => Local::now().format("%s %z").to_string(),
+        let config = Config::build();
+        let author_name = config.author.name;
+        let author_email = config.author.email;
+        let author_date = match config.author.date.len() {
+            0 => Local::now().format("%s %z").to_string(),
+            _ => config.author.date,
         };
         let author = format!("{} <{}> {}", author_name, author_email, author_date);
         let content = format!(

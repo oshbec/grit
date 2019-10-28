@@ -9,3 +9,5 @@ mod ignore;
 
 /// Persistence to the Git database
 mod objects;
+
+mod config;
