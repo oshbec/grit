@@ -38,5 +38,21 @@ fn creates_objects_found_in_real_git_commit() {
 
     assert_eq!(commit_id, found_commit_id);
 
+    test_bed.create_file("HOWDY", "good to meet you");
+    let second_commit_id = commit("Another commit").unwrap();
+
+    test_bed.git_command(vec!["add", "."]);
+    test_bed.git_command(vec!["commit", "-m", "Another commit"]);
+
+    assert!(
+        test_bed.contained_by_twin(".git/objects"),
+        "Files in workspace not contained by twin, take a look:\n{:?}",
+        test_bed.root
+    );
+
+    let found_second_commit_id = fs::read_to_string(".git/HEAD").unwrap();
+
+    assert_eq!(second_commit_id, found_second_commit_id);
+
     test_bed.teardown();
 }

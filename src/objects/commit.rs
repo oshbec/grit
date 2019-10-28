@@ -1,7 +1,7 @@
 use crate::objects::{Kind, Object};
 use chrono::Local;
 
-use crate::config::Config;
+use crate::{config::Config, refs};
 
 #[derive(Debug)]
 pub struct Commit {
@@ -17,10 +17,14 @@ impl Commit {
             0 => Local::now().format("%s %z").to_string(),
             _ => config.author.date,
         };
+        let parent = match refs::read_head() {
+            Some(head) => format!("parent {}\n", head),
+            None => String::from(""),
+        };
         let author = format!("{} <{}> {}", author_name, author_email, author_date);
         let content = format!(
-            "tree {}\nauthor {}\ncommitter {}\n\n{}\n",
-            tree_id, author, author, message
+            "tree {}\n{}author {}\ncommitter {}\n\n{}\n",
+            tree_id, parent, author, author, message
         )
         .as_bytes()
         .to_owned();
