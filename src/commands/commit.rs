@@ -3,6 +3,7 @@ use std::{env, fs, path::PathBuf};
 use crate::{
     ignore::Ignore,
     objects::{self, Blob, Commit, Object, Tree},
+    refs,
 };
 
 /// Record changes to the repository
@@ -22,7 +23,7 @@ pub fn run(message: &str) -> Result<String, String> {
     objects::write(&tree).expect("Couldn't write tree to git database");
     let commit = Commit::new(tree.id(), message);
     objects::write(&commit).expect("Couldn't write the commit to git database");
-    fs::write(".git/HEAD", commit.id()).expect("Couldn't write commit ID to HEAD");
+    refs::update_head(&commit.id());
     Ok(commit.id())
 }
 
