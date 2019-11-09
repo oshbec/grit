@@ -1,21 +1,18 @@
+use crate::compression;
+pub use blob::Blob;
+pub use commit::Commit;
+use sha1;
 use std::{
     env, fs,
     io::{self, Write},
     path::PathBuf,
 };
-
-use sha1;
+pub use tree::Tree;
 use uuid::Uuid;
 
 mod blob;
 mod commit;
 mod tree;
-
-pub use blob::Blob;
-pub use commit::Commit;
-pub use tree::Tree;
-
-use crate::compression;
 
 /// The kind of object we're dealing with
 pub enum Kind {

@@ -1,9 +1,8 @@
-use clap::{value_t, App, Arg, SubCommand};
-use std::path::PathBuf;
-
 extern crate grit;
 
+use clap::{value_t, App, Arg, SubCommand};
 use grit::commands;
+use std::path::PathBuf;
 
 fn main() {
     let matches = App::new("grit")

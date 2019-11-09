@@ -1,11 +1,9 @@
 mod common;
-use grit::commands::{commit, init};
-
-use common::TestBed;
-
-use std::{env, fs};
 
 use chrono::Local;
+use common::TestBed;
+use grit::commands::{commit, init};
+use std::{env, fs};
 
 #[test]
 fn creates_objects_found_in_real_git_commit() {

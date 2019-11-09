@@ -1,10 +1,9 @@
-use std::{env, fs, path::PathBuf};
-
 use crate::{
     ignore::Ignore,
     objects::{self, Blob, Commit, Object, Tree},
     refs,
 };
+use std::{env, fs, path::PathBuf};
 
 /// Record changes to the repository
 pub fn run(message: &str) -> Result<String, String> {

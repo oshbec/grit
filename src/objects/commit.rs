@@ -1,7 +1,6 @@
 use crate::objects::{Kind, Object};
-use chrono::Local;
-
 use crate::{config::Config, refs};
+use chrono::Local;
 
 #[derive(Debug)]
 pub struct Commit {

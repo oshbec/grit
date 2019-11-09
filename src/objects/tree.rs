@@ -1,6 +1,5 @@
 use crate::objects::{blob::Blob, Kind, Object};
 use hex;
-
 use std::{env, path::PathBuf};
 
 #[derive(Debug)]
