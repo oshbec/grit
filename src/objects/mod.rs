@@ -1,7 +1,7 @@
 use crate::compression;
 pub use blob::Blob;
 pub use commit::Commit;
-use sha1;
+use sha1::{Digest, Sha1};
 use std::{
     env, fs,
     io::{self, Write},
@@ -35,10 +35,10 @@ pub trait Object {
 
     /// Calculate the ID of the object, given a hash of its file
     fn id(&self) -> String {
-        let mut hash = sha1::Sha1::new();
+        let mut hash = Sha1::new();
         let content = self.build_file();
         hash.update(content.as_slice());
-        hash.digest().to_string()
+        hex::encode(hash.finalize())
     }
 
     /// Show the path to where the object might be saved in the database
@@ -67,6 +67,7 @@ pub trait Object {
     }
 
     /// Show the formatted object file in a readable, but lossy way
+    #[allow(dead_code)]
     fn show_file(&self) -> String {
         String::from_utf8_lossy(&self.build_file()).into_owned()
     }

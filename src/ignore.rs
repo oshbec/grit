@@ -1,4 +1,4 @@
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 
 /// Holds ignore patterns and answers questions about whether stuff should be ignored
 pub struct Ignore {
@@ -19,13 +19,12 @@ impl Ignore {
     }
 
     /// Check to see if a given path should be ignored
-    pub fn ignore_item(&self, path: &PathBuf) -> bool {
+    pub fn ignore_item(&self, path: &Path) -> bool {
         let file_name: String = path
             .file_name()
             .expect("Couldn't get file name from path")
             .to_string_lossy()
-            .to_owned()
-            .to_string();
+            .into_owned();
         self.patterns.contains(&file_name)
     }
 
@@ -33,7 +32,7 @@ impl Ignore {
     pub fn ignore_items(&self, paths: Vec<PathBuf>) -> Vec<PathBuf> {
         paths
             .into_iter()
-            .filter(|p| !self.ignore_item(&p))
+            .filter(|p| !self.ignore_item(p))
             .collect()
     }
 }

@@ -5,10 +5,7 @@ pub fn update_head(oid: &str) {
 }
 
 pub fn read_head() -> Option<String> {
-    match fs::read_to_string(head_path()) {
-        Ok(head) => Some(head),
-        Err(_) => None,
-    }
+    fs::read_to_string(head_path()).ok()
 }
 
 fn head_path() -> PathBuf {

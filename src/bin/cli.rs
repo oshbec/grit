@@ -1,42 +1,41 @@
-extern crate grit;
-
-use clap::{value_t, App, Arg, SubCommand};
+use clap::{Parser, Subcommand};
 use grit::commands;
 use std::path::PathBuf;
 
+#[derive(Parser)]
+#[command(name = "grit")]
+#[command(version = "1.0")]
+#[command(about = "A rust implementation of git", author = "Josh Bechard")]
+struct Cli {
+    #[command(subcommand)]
+    command: Commands,
+}
+
+#[derive(Subcommand)]
+enum Commands {
+    /// Create an empty Git repository or reinitialize an existing one
+    Init {
+        /// Where the repository lives
+        directory: Option<PathBuf>,
+    },
+    /// Commit some code
+    Commit {
+        /// A helpful message to accompany the commit
+        #[arg(short)]
+        m: Option<String>,
+    },
+}
+
 fn main() {
-    let matches = App::new("grit")
-        .version("1.0")
-        .about("A rust implementation of git")
-        .author("Josh Bechard")
-        .subcommand(
-            SubCommand::with_name("init")
-                .about("Create an empty Git repository or reinitialize an existing one")
-                .arg(Arg::with_name("directory").help("Where the repository lives")),
-        )
-        .subcommand(
-            SubCommand::with_name("commit")
-                .about("Commit some code")
-                .arg(
-                    Arg::with_name("message")
-                        .short("m")
-                        .help("A helpful message to accompany the commit"),
-                ),
-        )
-        .get_matches();
+    let cli = Cli::parse();
 
-    if let Some(init) = matches.subcommand_matches("init") {
-        match value_t!(init, "directory", PathBuf) {
-            Ok(directory) => commands::init(Some(&directory)),
-            Err(_) => commands::init(None),
-        };
-    }
-
-    if let Some(commit) = matches.subcommand_matches("commit") {
-        let message = match value_t!(commit, "message", String) {
-            Ok(message) => message,
-            Err(_) => "".to_string(),
-        };
-        commands::commit(&message).unwrap();
+    match cli.command {
+        Commands::Init { directory } => {
+            commands::init(directory.as_ref());
+        }
+        Commands::Commit { m } => {
+            let message = m.unwrap_or_default();
+            commands::commit(&message).unwrap();
+        }
     }
 }

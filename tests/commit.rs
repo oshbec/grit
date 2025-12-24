@@ -17,8 +17,11 @@ fn creates_objects_found_in_real_git_commit() {
     let message = "It is a commit!";
     let right_now = Local::now().format("%s %z").to_string();
 
-    env::set_var("GIT_AUTHOR_DATE", &right_now);
-    env::set_var("GIT_COMMITTER_DATE", &right_now);
+    // SAFETY: Tests run single-threaded (--test-threads=1), so env var mutation is safe
+    unsafe {
+        env::set_var("GIT_AUTHOR_DATE", &right_now);
+        env::set_var("GIT_COMMITTER_DATE", &right_now);
+    }
 
     let commit_id = commit(message).unwrap();
 

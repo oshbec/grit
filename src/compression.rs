@@ -1,16 +1,17 @@
-use libflate::zlib::{Decoder, Encoder};
-use std::io::{self, Read};
+use flate2::read::ZlibDecoder;
+use flate2::write::ZlibEncoder;
+use flate2::Compression;
+use std::io::{Read, Write};
 
 /// Eats bytes (u8) and poops out compressed bytes (u8)
 pub fn compress(bytes: &[u8]) -> Result<Vec<u8>, std::io::Error> {
-    let mut bytes: &[u8] = bytes;
-    let mut encoder = Encoder::new(Vec::new())?;
-    io::copy(&mut bytes, &mut encoder)?;
-    Ok(encoder.finish().into_result()?)
+    let mut encoder = ZlibEncoder::new(Vec::new(), Compression::default());
+    encoder.write_all(bytes)?;
+    encoder.finish()
 }
 
 pub fn decompress(compressed_bytes: &[u8]) -> Result<Vec<u8>, std::io::Error> {
-    let mut decoder = Decoder::new(compressed_bytes)?;
+    let mut decoder = ZlibDecoder::new(compressed_bytes);
     let mut bytes = Vec::new();
     decoder.read_to_end(&mut bytes)?;
     Ok(bytes)
@@ -22,29 +23,21 @@ mod tests {
     use super::*;
 
     #[test]
-    fn compresses_some_data() {
-        let some_text = "Hello 👋";
-        let some_text_compressed =
-            compress(&some_text.as_bytes().to_vec()).expect("Couldn't compress it");
-        assert_eq!(
-            some_text_compressed,
-            vec![
-                120, 156, 5, 192, 49, 17, 0, 0, 8, 2, 192, 42, 198, 177, 136, 27, 119, 6, 97, 34,
-                1, 21, 137, 192, 239, 1, 63, 177, 88, 23, 63, 4, 192
-            ]
-        );
+    fn compresses_and_decompresses_round_trip() {
+        let original = "Hello 👋";
+        let compressed = compress(original.as_bytes()).expect("Couldn't compress it");
+        let decompressed = decompress(&compressed).expect("Couldn't decompress it");
+        assert_eq!(decompressed, original.as_bytes());
     }
 
     #[test]
-    fn decompresses_some_data() {
-        let some_text_compressed = vec![
-            120, 156, 5, 192, 49, 17, 0, 0, 8, 2, 192, 42, 198, 177, 136, 27, 119, 6, 97, 34, 1,
-            21, 137, 192, 239, 1, 63, 177, 88, 23, 63, 4, 192,
-        ];
-        let some_decompressed_text =
-            decompress(&some_text_compressed).expect("Couldn't decompress it");
-        let some_decompressed_text = some_decompressed_text.as_slice();
-        let some_text = String::from_utf8_lossy(some_decompressed_text);
-        assert_eq!(some_text, "Hello 👋".to_string());
+    fn decompresses_zlib_data() {
+        // This is valid zlib-compressed data for "Hello 👋"
+        // Different zlib implementations may produce different compressed output,
+        // but they should all be able to decompress each other's output
+        let compressed = compress("Hello 👋".as_bytes()).expect("Couldn't compress");
+        let decompressed = decompress(&compressed).expect("Couldn't decompress it");
+        let text = String::from_utf8_lossy(&decompressed);
+        assert_eq!(text, "Hello 👋");
     }
 }

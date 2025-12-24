@@ -1,5 +1,6 @@
 use std::{collections::HashMap, env, path::PathBuf};
 
+#[allow(dead_code)]
 pub struct Config {
     pub user: User,
     pub author: User,

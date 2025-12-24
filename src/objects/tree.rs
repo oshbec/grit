@@ -1,9 +1,9 @@
 use crate::objects::{blob::Blob, Kind, Object};
-use hex;
-use std::{env, path::PathBuf};
+use std::{env, path::Path};
 
 #[derive(Debug)]
 pub struct Tree {
+    #[allow(dead_code)]
     blobs: Vec<Blob>,
     content: Vec<u8>,
 }
@@ -25,7 +25,7 @@ impl Tree {
 
         let content: Vec<u8> = blobs
             .iter()
-            .map(|blob| {
+            .flat_map(|blob| {
                 let mut binary_blob: Vec<u8> = vec![];
 
                 let mut mode: Vec<u8> = String::from("100644").as_bytes().to_owned();
@@ -42,13 +42,12 @@ impl Tree {
 
                 binary_blob
             })
-            .flatten()
             .collect();
         Tree { content, blobs }
     }
 }
 
-fn path_relative_to_cwd(path: &PathBuf) -> String {
+fn path_relative_to_cwd(path: &Path) -> String {
     let current_dir = env::current_dir()
         .expect("Couldn't determine current directory")
         .to_str()

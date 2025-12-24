@@ -16,10 +16,13 @@ impl TestBed {
         fs::create_dir_all(test_bed.workspace()).expect("Couldn't create workspace directory");
         fs::create_dir_all(test_bed.twin()).expect("Couldn't create twin directory");
         env::set_current_dir(test_bed.workspace()).expect("Couldn't set workspace to CWD");
-        env::set_var("GIT_AUTHOR_NAME", "Count Dracula");
-        env::set_var("GIT_AUTHOR_EMAIL", "count@dracula");
-        env::set_var("GIT_COMMITTER_NAME", "Count Dracula");
-        env::set_var("GIT_COMMITTER_EMAIL", "count@dracula");
+        // SAFETY: Tests run single-threaded (--test-threads=1), so env var mutation is safe
+        unsafe {
+            env::set_var("GIT_AUTHOR_NAME", "Count Dracula");
+            env::set_var("GIT_AUTHOR_EMAIL", "count@dracula");
+            env::set_var("GIT_COMMITTER_NAME", "Count Dracula");
+            env::set_var("GIT_COMMITTER_EMAIL", "count@dracula");
+        }
         test_bed
     }
 
@@ -64,6 +67,13 @@ impl TestBed {
         Command::new("git")
             .args(args)
             .current_dir(&self.twin())
+            // Disable any system/global git config that might interfere with tests
+            .env("GIT_CONFIG_NOSYSTEM", "1")
+            .env("GIT_CONFIG_GLOBAL", "/dev/null")
+            .env("GIT_AUTHOR_NAME", "Count Dracula")
+            .env("GIT_AUTHOR_EMAIL", "count@dracula")
+            .env("GIT_COMMITTER_NAME", "Count Dracula")
+            .env("GIT_COMMITTER_EMAIL", "count@dracula")
             .output()
             .expect("Git command failed");
     }
